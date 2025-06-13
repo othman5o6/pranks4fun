@@ -1,281 +1,121 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الكنز الضائع</title>
-  <style>
-    :root {
-      --bg-color: #1e1e2f;
-      --text-color: white;
-      --rule-bg: #2c2c3e;
-    }
-
-    body.light {
-      --bg-color: #f4f4f4;
-      --text-color: #1e1e2f;
-      --rule-bg: #ddd;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
-      text-align: center;
-      padding: 50px 20px;
-      direction: rtl;
-      transition: all 0.3s ease;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      color: gold;
-      font-size: 2rem;
-    }
-
-    #themeToggle {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 8px 12px;
-      border-radius: 12px;
-      border: 2px solid var(--text-color);
-      background-color: var(--rule-bg);
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s, border 0.3s;
-    }
-
-    #themeToggle:hover {
-      background-color: var(--text-color);
-      color: var(--bg-color);
-    }
-
-    #grid {
-      display: grid;
-      grid-template-columns: repeat(5, 60px);
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .cell {
-      width: 60px;
-      height: 60px;
-      background: #444;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .hot {
-      background: #e84118 !important;
-      animation: pulse 0.6s infinite alternate;
-    }
-
-    .warm {
-      background: #3498db !important;
-      animation: pulse 0.6s infinite alternate;
-    }
-
-    .cold {
-      background: #ffffff !important;
-      animation: pulse 0.6s infinite alternate;
-    }
-
-    .treasure {
-      background: linear-gradient(45deg, gold, #ffd700);
-      color: black;
-      font-weight: bold;
-      animation: sparkle 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        transform: scale(1);
-        opacity: 0.8;
-      }
-      to {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-    }
-
-    @keyframes sparkle {
-      from {
-        box-shadow: 0 0 10px gold;
-      }
-      to {
-        box-shadow: 0 0 20px #ffd700, 0 0 30px gold;
-      }
-    }
-
-    #message {
-      margin-top: 20px;
-      font-size: 20px;
-    }
-
-    #rules {
-      margin-top: 40px;
-      background: var(--rule-bg);
-      padding: 20px;
-      border-radius: 12px;
-      text-align: right;
-      max-width: 500px;
-      margin-inline: auto;
-    }
-
-    #rules h2 {
-      color: gold;
-    }
-
-    #rules ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    #rules li {
-      margin-bottom: 10px;
-    }
-
-    #resetBtn {
-      display: none;
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #00c853;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
-
-    @media (max-width: 600px) {
-      #grid {
-        grid-template-columns: repeat(5, 40px);
-        gap: 6px;
-      }
-
-      .cell {
-        width: 40px;
-        height: 40px;
-        font-size: 14px;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      #message {
-        font-size: 16px;
-      }
-
-      #rules {
-        font-size: 14px;
-        padding: 15px;
-      }
-    }
-  </style>
-</head>
 <body>
-  <button id="themeToggle">🌙</button>
-<h1> ( تصميم عثمان بمساعدة الذكاء الاصطناعي ) </h1>
-  
-<h1>لعبة الكنز الضائع ♥️</h1>
-  <div id="grid"></div>
+  <h1>لعبة الكنز الضائع</h1>
+  <button id="themeToggle">🌓</button>
+  <div id="attemptCounter">المحاولات: <span id="attempts">0</span> / <span id="maxAttempts">5</span></div>
+  <div class="grid-wrapper">
+    <div id="grid"></div>
+  </div>
   <div id="message"></div>
-  <button id="resetBtn" onclick="resetGame()">🔁 إعادة اللعب</button>
+  <div id="confetti"></div>
+  <div id="overlay">
+    <p>مبروك! لقد فزت بالمستوى الأول! 🎉</p>
+    <button onclick="resetGame()">إعادة اللعب</button>
+  </div>
 
   <div id="rules">
-    <h2>القوانين:</h2>
+    <h2>قواعد اللعبة:</h2>
     <ul>
-      <li>🔍 اضغط على المربعات للبحث عن الكنز.</li>
-      <li>🎯 هدفك هو إيجاد مكان الكنز المخفي في الشبكة.</li>
-      <li>🔥 "حار مرة" = قريب جدًا من الكنز.</li>
-      <li>🔵 "قريب شوي" = المسافة متوسطة.</li>
-      <li>⚪ "بعيد جداً" = بعيد تمامًا عن الكنز.</li>
-      <li>🏆 عند العثور على الكنز، ينتهي التحدي!</li>
+      <li>هناك خلية واحدة تحتوي على الكنز 🪙</li>
+      <li>لديك 5 محاولات فقط للعثور عليه!</li>
+      <li>التلميحات بالألوان:
+        <ul>
+          <li><strong style="color: red">أحمر</strong>: قريب جدًا</li>
+          <li><strong style="color: #3498db">أزرق</strong>: قريب</li>
+          <li><strong style="color: #ffffff">أبيض</strong>: بعيد</li>
+        </ul>
+      </li>
     </ul>
   </div>
 
   <script>
-    const grid = document.getElementById('grid');
-    const message = document.getElementById('message');
-    const resetBtn = document.getElementById('resetBtn');
-    const themeToggle = document.getElementById('themeToggle');
-    const size = 5;
-    let cells = [];
-    let treasureX, treasureY;
-    let gameOver = false;
+    const gridSize = 5;
+    const maxAttempts = 5;
+    let treasureIndex;
+    let attempts = 0;
 
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('light');
-      themeToggle.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
-    });
+    const grid = document.getElementById("grid");
+    const attemptsDisplay = document.getElementById("attempts");
+    const maxAttemptsDisplay = document.getElementById("maxAttempts");
+    const message = document.getElementById("message");
+    const confetti = document.getElementById("confetti");
+    const overlay = document.getElementById("overlay");
 
-    function getDistance(x1, y1, x2, y2) {
+    maxAttemptsDisplay.textContent = maxAttempts;
+
+    function createGrid() {
+      grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+      grid.innerHTML = "";
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.addEventListener("click", () => handleCellClick(i, cell));
+        grid.appendChild(cell);
+      }
+      treasureIndex = Math.floor(Math.random() * gridSize * gridSize);
+    }
+
+    function handleCellClick(index, cell) {
+      if (cell.classList.contains("treasure") || attempts >= maxAttempts) return;
+      attempts++;
+      attemptsDisplay.textContent = attempts;
+
+      if (index === treasureIndex) {
+        cell.classList.add("treasure");
+        message.textContent = "🎉 لقد وجدت الكنز!";
+        message.classList.add("show");
+        showOverlay();
+        throwConfetti();
+      } else {
+        const distance = getDistance(index, treasureIndex);
+        cell.classList.add(getHintClass(distance));
+      }
+    }
+
+    function getDistance(i1, i2) {
+      const x1 = i1 % gridSize;
+      const y1 = Math.floor(i1 / gridSize);
+      const x2 = i2 % gridSize;
+      const y2 = Math.floor(i2 / gridSize);
       return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    function createGrid() {
-      grid.innerHTML = '';
-      cells = [];
-      treasureX = Math.floor(Math.random() * size);
-      treasureY = Math.floor(Math.random() * size);
-      gameOver = false;
-      message.textContent = '';
-      resetBtn.style.display = 'none';
+    function getHintClass(distance) {
+      if (distance <= 1) return "hot";
+      if (distance <= 2) return "warm";
+      return "cold";
+    }
 
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          cell.dataset.x = x;
-          cell.dataset.y = y;
-          cell.addEventListener('click', () => handleClick(cell));
-          grid.appendChild(cell);
-          cells.push(cell);
-        }
+    function throwConfetti() {
+      for (let i = 0; i < 80; i++) {
+        const piece = document.createElement("div");
+        piece.classList.add("confetti-piece");
+        piece.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.top = `-${Math.random() * 20 + 10}px`;
+        piece.style.animationDelay = `${Math.random()}s`;
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetti.appendChild(piece);
+        setTimeout(() => confetti.removeChild(piece), 3000);
       }
     }
 
-    function handleClick(cell) {
-      if (gameOver) return;
-      const dx = parseInt(cell.dataset.x);
-      const dy = parseInt(cell.dataset.y);
-      const dist = getDistance(dx, dy, treasureX, treasureY);
-
-      if (dx === treasureX && dy === treasureY) {
-        cell.className = 'cell treasure';
-        cell.textContent = '💰';
-        message.textContent = 'مبروك! لقيت الكنز!';
-        gameOver = true;
-        resetBtn.style.display = 'inline-block';
-      } else {
-        if (dist <= 1) {
-          cell.className = 'cell hot';
-          message.textContent = 'واو! حار مرة 🔥';
-        } else if (dist <= 2) {
-          cell.className = 'cell warm';
-          message.textContent = 'قريب شوي 🔵';
-        } else {
-          cell.className = 'cell cold';
-          message.textContent = 'بعيد جداً... ⚪';
-        }
-      }
+    function showOverlay() {
+      overlay.style.display = "flex";
     }
 
     function resetGame() {
+      attempts = 0;
+      attemptsDisplay.textContent = attempts;
+      message.classList.remove("show");
+      overlay.style.display = "none";
+      confetti.innerHTML = "";
       createGrid();
     }
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      document.body.classList.toggle("light");
+    });
 
     createGrid();
   </script>
 </body>
-</html>
-
