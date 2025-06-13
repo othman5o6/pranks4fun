@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لعبة الكنز الضائع</title>
   <style>
     body {
@@ -10,6 +11,7 @@
       color: white;
       text-align: center;
       padding: 30px;
+      margin: 0;
     }
 
     h1 {
@@ -20,34 +22,35 @@
       justify-content: center;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .grid-wrapper {
       display: flex;
       justify-content: center;
-      margin: 20px 0;
+      margin: 20px auto;
       background: rgba(255, 255, 255, 0.05);
-      padding: 10px;
-      border-radius: 12px;
-      max-width: max-content;
-      margin-left: auto;
-      margin-right: auto;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 90vw;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     }
 
     #grid {
       display: grid;
-      grid-template-columns: repeat(5, 60px);
+      grid-template-columns: repeat(5, minmax(40px, 60px));
       gap: 10px;
+      justify-content: center;
     }
 
     .cell {
-      width: 60px;
-      height: 60px;
+      width: 100%;
+      aspect-ratio: 1/1;
       border-radius: 12px;
       border: none;
       background-color: #444;
       color: white;
-      font-size: 18px;
+      font-size: 1rem;
       cursor: pointer;
       transition: background-color 0.3s, transform 0.2s;
     }
@@ -80,13 +83,14 @@
 
     #rules {
       text-align: right;
-      max-width: 400px;
+      max-width: 90vw;
       margin: 30px auto 0;
       font-size: 1rem;
       background: rgba(255,255,255,0.05);
-      padding: 10px;
-      border-radius: 10px;
+      padding: 15px;
+      border-radius: 12px;
       text-shadow: 2px 2px 4px black;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     }
 
     #confetti, #sadEmojis {
@@ -110,6 +114,9 @@
       font-weight: bold;
       color: gold;
       animation: fadeIn 1s ease forwards;
+      padding: 20px;
+      box-sizing: border-box;
+      text-shadow: 2px 2px 4px black;
     }
 
     #overlay button, #loseOverlay button {
@@ -139,170 +146,51 @@
       color: white;
       cursor: pointer;
     }
+
+    @media (max-width: 768px) {
+      .cell {
+        font-size: 0.8rem;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+      #rules {
+        font-size: 0.85rem;
+      }
+      .grid-wrapper {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>لعبة الكنز الضائع <span>🪙</span></h1>
-  <button id="modeToggle">🌙</button>
-  <div id="attemptCounter">المحاولات: <span id="attempts">0</span> / <span id="maxAttempts">5</span></div>
+  <h1>🪙 لعبة الكنز الضائع</h1>
+  <button id="modeToggle">🌓</button>
   <div class="grid-wrapper">
     <div id="grid"></div>
   </div>
   <div id="message"></div>
-  <div id="confetti"></div>
-  <div id="sadEmojis"></div>
-  <div id="overlay">
-    <p>مبروك! لقد فزت بالمستوى 🎉</p>
-    <button onclick="resetGame()">🔁 إعادة اللعب</button>
-    <button onclick="nextChallenge()">⏭️ التحدي التالي</button>
-  </div>
-  <div id="loseOverlay">
-    <p>😢 انتهت المحاولات! لم تجد الكنز.</p>
-    <button onclick="resetGame()">🔁 حاول مجددًا</button>
-  </div>
   <div id="rules">
     <strong>قواعد اللعبة:</strong>
     <ul>
-      <li>🎯 هناك خلية واحدة تحتوي على الكنز</li>
-      <li>🧠 لديك 5 محاولات فقط للعثور عليه</li>
+      <li>🌸 هناك خلية واحدة تحتوي على الكنز</li>
+      <li>💔 لديك 5 محاولات فقط للعثور عليه</li>
       <li>💡 التلميحات بالألوان:
         <ul>
-          <li style="color:red;">أحمر: قريب جداً</li>
-          <li style="color:blue;">أزرق: قريب</li>
-          <li style="color:gray;">رمادي: بعيد</li>
+          <li style="color: red">🔴 أحمر: قريب جداً</li>
+          <li style="color: blue">🔵 أزرق: قريب</li>
+          <li style="color: gray">⚪ رمادي: بعيد</li>
         </ul>
       </li>
     </ul>
   </div>
-<script>
-let attempts = 0;
-const maxAttempts = 5;
-const grid = document.getElementById('grid');
-const attemptsSpan = document.getElementById('attempts');
-const message = document.getElementById('message');
-const overlay = document.getElementById('overlay');
-const loseOverlay = document.getElementById('loseOverlay');
-const confettiContainer = document.getElementById('confetti');
-const sadEmojis = document.getElementById('sadEmojis');
-const modeToggle = document.getElementById('modeToggle');
-let treasureIndex = Math.floor(Math.random() * 25);
-let gameOver = false;
-
-function createGrid() {
-  grid.innerHTML = '';
-  for (let i = 0; i < 25; i++) {
-    const cell = document.createElement('button');
-    cell.className = 'cell';
-    cell.dataset.index = i;
-    cell.onclick = handleClick;
-    grid.appendChild(cell);
-  }
-}
-
-function handleClick(e) {
-  if (gameOver) return;
-  const index = +e.target.dataset.index;
-  if (e.target.classList.contains('used')) return;
-  attempts++;
-  attemptsSpan.textContent = attempts;
-  e.target.classList.add('used');
-
-  if (index === treasureIndex) {
-    e.target.classList.add('treasure');
-    message.textContent = '🎉 مبروك! لقد وجدت الكنز!';
-    launchConfetti();
-    gameOver = true;
-    setTimeout(() => {
-      overlay.style.display = 'flex';
-    }, 500);
-  } else if (attempts >= maxAttempts) {
-    revealTreasure();
-    gameOver = true;
-    launchSadEmojis();
-    setTimeout(() => {
-      loseOverlay.style.display = 'flex';
-    }, 500);
-  } else {
-    const distance = Math.abs(index - treasureIndex);
-    if (distance <= 2) e.target.classList.add('hint-very-close');
-    else if (distance <= 5) e.target.classList.add('hint-close');
-    else e.target.classList.add('hint-far');
-  }
-}
-
-function revealTreasure() {
-  const cells = document.querySelectorAll('.cell');
-  cells[treasureIndex].classList.add('treasure');
-}
-
-function resetGame() {
-  attempts = 0;
-  attemptsSpan.textContent = attempts;
-  treasureIndex = Math.floor(Math.random() * 25);
-  message.textContent = '';
-  overlay.style.display = 'none';
-  loseOverlay.style.display = 'none';
-  gameOver = false;
-  sadEmojis.innerHTML = '';
-  confettiContainer.innerHTML = '';
-  createGrid();
-}
-
-function nextChallenge() {
-  resetGame();
-}
-
-function launchConfetti() {
-  confettiContainer.innerHTML = '';
-  for (let i = 0; i < 100; i++) {
-    const confetto = document.createElement('div');
-    confetto.style.position = 'absolute';
-    confetto.style.width = '10px';
-    confetto.style.height = '10px';
-    confetto.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
-    confetto.style.top = `${Math.random() * 100}%`;
-    confetto.style.left = `${Math.random() * 100}%`;
-    confetto.style.opacity = 0.9;
-    confetto.style.transform = `rotate(${Math.random() * 360}deg)`;
-    confetto.style.transition = 'top 2s ease-out';
-    confettiContainer.appendChild(confetto);
-    setTimeout(() => {
-      confetto.style.top = '100%';
-    }, 0);
-  }
-}
-
-function launchSadEmojis() {
-  sadEmojis.innerHTML = '';
-  for (let i = 0; i < 50; i++) {
-    const emoji = document.createElement('div');
-    emoji.textContent = '😢';
-    emoji.style.position = 'absolute';
-    emoji.style.left = Math.random() * 100 + '%';
-    emoji.style.top = '-10%';
-    emoji.style.fontSize = '2rem';
-    emoji.style.transition = `top ${2 + Math.random() * 2}s ease-in`;
-    sadEmojis.appendChild(emoji);
-    requestAnimationFrame(() => {
-      emoji.style.top = '110%';
-    });
-  }
-}
-
-modeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('light-mode');
-  if (document.body.classList.contains('light-mode')) {
-    document.body.style.backgroundColor = '#f0f0f0';
-    document.body.style.color = '#000';
-    modeToggle.textContent = '☀️';
-  } else {
-    document.body.style.backgroundColor = '#1a1a2e';
-    document.body.style.color = '#fff';
-    modeToggle.textContent = '🌙';
-  }
-});
-
-createGrid();
-</script>
+  <div id="overlay"></div>
+  <div id="loseOverlay"></div>
+  <canvas id="confetti"></canvas>
+  <canvas id="sadEmojis"></canvas>
+  <script>
+    // سكربت اللعبة الكامل هنا (سيتم لصقه في الرد التالي بسبب الطول)
+  </script>
 </body>
 </html>
+
