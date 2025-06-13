@@ -1,234 +1,218 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>لعبة الكنز الضائع</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #1a1a2e;
-      color: white;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
       text-align: center;
-      direction: rtl;
-      margin: 0;
-      padding: 0;
+      padding: 30px;
+      color: #222;
     }
 
     h1 {
       font-size: 2rem;
-      margin: 20px 0 10px;
-    }
-
-    #themeToggle {
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      cursor: pointer;
+      color: #333;
     }
 
     .grid-wrapper {
       display: flex;
       justify-content: center;
-      margin-top: 20px;
+      margin: 20px 0;
     }
 
     #grid {
       display: grid;
       grid-template-columns: repeat(5, 60px);
-      grid-template-rows: repeat(5, 60px);
-      gap: 5px;
+      gap: 10px;
     }
 
     .cell {
       width: 60px;
       height: 60px;
-      background-color: #fff;
-      color: black;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 12px;
+      border: none;
+      background-color: #dcdcdc;
       cursor: pointer;
-      border-radius: 4px;
+      transition: background-color 0.3s, transform 0.2s;
+      font-size: 18px;
     }
 
-    .cell.revealed {
-      pointer-events: none;
+    .cell:hover {
+      background-color: #c0c0c0;
+    }
+
+    .cell.treasure {
+      background-color: gold;
+    }
+
+    .cell.hint-very-close {
+      background-color: #ff4d4d;
+      color: white;
+    }
+
+    .cell.hint-close {
+      background-color: #4da6ff;
+      color: white;
+    }
+
+    .cell.hint-far {
+      background-color: #ccc;
     }
 
     #message {
-      margin: 15px 0;
-      font-size: 16px;
-      min-height: 24px;
+      font-size: 1.2rem;
+      margin-top: 15px;
+      color: green;
     }
 
     #rules {
-      background-color: #222;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 8px;
-      max-width: 400px;
-      margin-inline: auto;
       text-align: right;
-    }
-
-    #rules ul {
-      padding-right: 20px;
-    }
-
-    #rules li {
-      margin-bottom: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+      font-size: 1rem;
     }
 
     #confetti {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       pointer-events: none;
       z-index: 9999;
     }
 
-    @media (max-width: 600px) {
-      .cell {
-        width: 40px;
-        height: 40px;
-        font-size: 14px;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
+    #overlay {
+      display: none;
+      background-color: rgba(255, 255, 255, 0.85);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>لعبة الكنز الضائع</h1>
-  <button id="themeToggle">🌓</button>
-  <div id="attemptCounter">
-    المحاولات: <span id="attempts">0</span> / <span id="maxAttempts">5</span>
-  </div>
+  <h1>لعبة الكنز الضائع 🏆</h1>
+  <div id="attemptCounter">المحاولات: <span id="attempts">0</span> / <span id="maxAttempts">5</span></div>
+
   <div class="grid-wrapper">
     <div id="grid"></div>
   </div>
+
   <div id="message"></div>
   <div id="confetti"></div>
-  <div id="overlay" style="display:none;">
-    <p>مبروك! لقد فزت بالمستوى 🎉</p>
-    <button onclick="nextLevel()">المستوى التالي</button>
-  </div>
+  <div id="overlay"><p>مبروك! لقد فزت بالمستوى 🎉</p></div>
 
   <div id="rules">
     <strong>قواعد اللعبة:</strong>
     <ul>
-      <li>🪙 هناك خلية واحدة تحتوي على الكنز</li>
-      <li>لديك 5 محاولات فقط للعثور عليه!</li>
-      <li>التلميحات بالألوان:</li>
-      <li><span style="color:red;">أحمر:</span> قريب جدًا</li>
-      <li><span style="color:blue;">أزرق:</span> قريب</li>
-      <li>رمادي: بعيد</li>
+      <li>🎯 هناك خلية واحدة تحتوي على الكنز</li>
+      <li>🧠 لديك 5 محاولات فقط للعثور عليه</li>
+      <li>💡 التلميحات بالألوان:
+        <ul>
+          <li style="color:red;">أحمر: قريب جداً</li>
+          <li style="color:blue;">أزرق: قريب</li>
+          <li>رمادي: بعيد</li>
+        </ul>
+      </li>
     </ul>
   </div>
 
   <script>
-    const gridSize = 5;
+    const grid = document.getElementById('grid');
+    const message = document.getElementById('message');
+    const overlay = document.getElementById('overlay');
+    const confettiContainer = document.getElementById('confetti');
+    const attemptsSpan = document.getElementById('attempts');
     const maxAttempts = 5;
     let attempts = 0;
-    let treasureCell;
-    let level = 1;
+    let treasureIndex = Math.floor(Math.random() * 25);
 
-    const grid = document.getElementById('grid');
-    const attemptsSpan = document.getElementById('attempts');
-    const maxAttemptsSpan = document.getElementById('maxAttempts');
-    const message = document.getElementById('message');
-    const confetti = document.getElementById('confetti');
-    const overlay = document.getElementById('overlay');
-
-    maxAttemptsSpan.textContent = maxAttempts;
-
-    function setupGame() {
+    function createGrid() {
       grid.innerHTML = '';
-      attempts = 0;
-      attemptsSpan.textContent = attempts;
-      message.textContent = '';
-      overlay.style.display = 'none';
-      confetti.innerHTML = '';
-      const cells = [];
-
-      for (let i = 0; i < gridSize * gridSize; i++) {
-        const cell = document.createElement('div');
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('button');
         cell.className = 'cell';
         cell.dataset.index = i;
-        cell.addEventListener('click', handleCellClick);
-        cells.push(cell);
+        cell.onclick = handleClick;
         grid.appendChild(cell);
       }
-
-      treasureCell = Math.floor(Math.random() * cells.length);
     }
 
-    function handleCellClick(e) {
-      const index = parseInt(e.target.dataset.index);
-      if (index === treasureCell) {
-        e.target.style.backgroundColor = 'gold';
-        e.target.textContent = '🏆';
-        message.textContent = `🎉 مبروك! لقد وجدت الكنز في المستوى ${level}`;
-        showConfetti();
-        setTimeout(() => overlay.style.display = 'block', 800);
+    function handleClick(e) {
+      const index = +e.target.dataset.index;
+      if (e.target.classList.contains('used')) return;
+      attempts++;
+      attemptsSpan.textContent = attempts;
+      e.target.classList.add('used');
+
+      if (index === treasureIndex) {
+        e.target.classList.add('treasure');
+        message.textContent = '🎉 مبروك! لقد وجدت الكنز!';
+        launchConfetti();
+        setTimeout(() => {
+          overlay.style.display = 'flex';
+          setTimeout(() => {
+            resetGame();
+          }, 2000);
+        }, 1000);
+      } else if (attempts >= maxAttempts) {
+        message.textContent = 'انتهت المحاولات! حاول مرة أخرى.';
+        revealTreasure();
+        setTimeout(resetGame, 2000);
       } else {
-        e.target.classList.add('revealed');
-        e.target.textContent = '❌';
-        const diff = Math.abs(index - treasureCell);
-        if (diff <= 3) {
-          e.target.style.backgroundColor = 'red';
-          message.textContent = '🔥 قريب جدًا!';
-        } else if (diff <= 7) {
-          e.target.style.backgroundColor = 'blue';
-          message.textContent = '💧 قريب!';
+        const distance = Math.abs(index - treasureIndex);
+        if (distance <= 2) {
+          e.target.classList.add('hint-very-close');
+        } else if (distance <= 5) {
+          e.target.classList.add('hint-close');
         } else {
-          e.target.style.backgroundColor = 'gray';
-          message.textContent = 'بعيد.';
-        }
-
-        attempts++;
-        attemptsSpan.textContent = attempts;
-        if (attempts >= maxAttempts) {
-          message.textContent = `😢 انتهت المحاولات! الكنز كان في الخلية رقم ${treasureCell}`;
-          disableGrid();
+          e.target.classList.add('hint-far');
         }
       }
     }
 
-    function disableGrid() {
-      document.querySelectorAll('.cell').forEach(cell => {
-        cell.removeEventListener('click', handleCellClick);
-      });
+    function revealTreasure() {
+      const cells = document.querySelectorAll('.cell');
+      cells[treasureIndex].classList.add('treasure');
     }
 
-    function nextLevel() {
-      level++;
-      setupGame();
+    function resetGame() {
+      attempts = 0;
+      attemptsSpan.textContent = attempts;
+      treasureIndex = Math.floor(Math.random() * 25);
+      message.textContent = '';
+      overlay.style.display = 'none';
+      createGrid();
     }
 
-    function showConfetti() {
+    function launchConfetti() {
+      confettiContainer.innerHTML = '';
       for (let i = 0; i < 100; i++) {
-        const piece = document.createElement('div');
-        piece.style.position = 'absolute';
-        piece.style.width = '8px';
-        piece.style.height = '8px';
-        piece.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        piece.style.left = `${Math.random() * 100}%`;
-        piece.style.top = `${Math.random() * 100}%`;
-        piece.style.opacity = '0.8';
-        piece.style.borderRadius = '50%';
-        piece.style.animation = `fall ${Math.random() * 3 + 2}s linear infinite`;
-        confetti.appendChild(piece);
+        const confetto = document.createElement('div');
+        confetto.style.position = 'absolute';
+        confetto.style.width = '10px';
+        confetto.style.height = '10px';
+        confetto.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        confetto.style.top = `${Math.random() * 100}%`;
+        confetto.style.left = `${Math.random() * 100}%`;
+        confetto.style.opacity = 0.9;
+        confetto.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetto.style.transition = 'top 2s ease-out';
+        confettiContainer.appendChild(confetto);
+        setTimeout(() => {
+          confetto.style.top = '100%';
+        }, 0);
       }
     }
 
-    setupGame();
+    createGrid();
   </script>
 </body>
 </html>
