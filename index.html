@@ -29,6 +29,9 @@
       background: rgba(255, 255, 255, 0.05);
       padding: 10px;
       border-radius: 12px;
+      max-width: max-content;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     #grid {
@@ -101,9 +104,27 @@
       z-index: 999;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       font-size: 1.5rem;
       font-weight: bold;
       color: gold;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    #overlay button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: gold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #000;
+      font-size: 1rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     #modeToggle {
@@ -128,7 +149,11 @@
   </div>
   <div id="message"></div>
   <div id="confetti"></div>
-  <div id="overlay"><p>مبروك! لقد فزت بالمستوى 🎉</p></div>
+  <div id="overlay">
+    <p>مبروك! لقد فزت بالمستوى 🎉</p>
+    <button onclick="resetGame()">🔁 إعادة اللعب</button>
+    <button onclick="nextChallenge()">⏭️ التحدي التالي</button>
+  </div>
   <div id="rules">
     <strong>قواعد اللعبة:</strong>
     <ul>
@@ -178,8 +203,7 @@ function handleClick(e) {
     launchConfetti();
     setTimeout(() => {
       overlay.style.display = 'flex';
-      setTimeout(resetGame, 2000);
-    }, 1000);
+    }, 500);
   } else if (attempts >= maxAttempts) {
     message.textContent = 'انتهت المحاولات! حاول مرة أخرى.';
     revealTreasure();
@@ -204,6 +228,10 @@ function resetGame() {
   message.textContent = '';
   overlay.style.display = 'none';
   createGrid();
+}
+
+function nextChallenge() {
+  resetGame();
 }
 
 function launchConfetti() {
