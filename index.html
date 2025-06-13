@@ -6,9 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لعبة الكنز الضائع</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri&display=swap');
+
     body {
       font-family: 'Cairo', sans-serif;
-      background-color: #210028;
+      background-color: #19001f;
       margin: 0;
       padding: 0;
       color: #fff;
@@ -26,14 +28,14 @@
     }
 
     .dark-mode {
-      background-color: #210028;
+      background-color: #19001f;
       color: #fff;
     }
 
     .toggle-theme {
       position: absolute;
       top: 20px;
-      right: 20px;
+      left: 20px;
       padding: 10px;
       background: rgba(255, 255, 255, 0.2);
       border: 2px solid #ccc;
@@ -101,9 +103,10 @@
     .rules {
       background: rgba(255, 255, 255, 0.08);
       padding: 20px;
-      margin-top: 30px;
+      margin-top: 40px;
       border-radius: 12px;
-      font-size: 16px;
+      font-size: 17px;
+      font-family: 'Amiri', serif;
       max-width: 400px;
       text-align: right;
     }
@@ -144,6 +147,7 @@
     </ul>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script>
     const grid = document.getElementById("grid");
     const attemptsDisplay = document.getElementById("attempts");
@@ -168,18 +172,24 @@
     }
 
     function handleClick(e) {
-      if (gameOver) return;
-
+      if (gameOver || e.target.textContent) return;
       const row = +e.target.dataset.row;
       const col = +e.target.dataset.col;
       attempts++;
       const distance = Math.abs(row - treasureRow) + Math.abs(col - treasureCol);
 
+      e.target.style.transition = "transform 0.2s ease, background-color 0.3s ease";
+      e.target.style.transform = "scale(0.95)";
+
+      setTimeout(() => {
+        e.target.style.transform = "scale(1)";
+      }, 200);
+
       if (row === treasureRow && col === treasureCol) {
         e.target.textContent = "💰";
         confetti();
         gameOver = true;
-        alert("🎉 مبروك! لقد وجدت الكنز!");
+        setTimeout(() => alert("🎉 مبروك! لقد وجدت الكنز!"), 300);
       } else {
         e.target.textContent = "🌑";
         if (distance === 1) {
@@ -190,10 +200,11 @@
           e.target.style.backgroundColor = "gray";
         }
       }
+
       attemptsDisplay.textContent = `المحاولات: ${attempts} / ${maxAttempts}`;
       if (attempts >= maxAttempts && !gameOver) {
         gameOver = true;
-        alert("❌ انتهت المحاولات! حاول مرة أخرى.");
+        setTimeout(() => alert("❌ انتهت المحاولات! حاول مرة أخرى."), 300);
       }
     }
 
@@ -208,7 +219,7 @@
     function confetti() {
       const duration = 2 * 1000;
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+      const defaults = { startVelocity: 25, spread: 360, ticks: 100, zIndex: 1000, decay: 0.9 }; // decay added
 
       function randomInRange(min, max) {
         return Math.random() * (max - min) + min;
@@ -222,19 +233,18 @@
         }
 
         confettiLib({
-          particleCount: 50,
+          particleCount: 40,
           origin: {
             x: randomInRange(0.1, 0.9),
-            y: Math.random() - 0.2
+            y: Math.random() * 0.4
           },
           ...defaults
         });
-      }, 250);
+      }, 200);
     }
 
     createGrid();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </body>
 
 </html>
