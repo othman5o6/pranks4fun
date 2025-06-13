@@ -88,14 +88,14 @@
       border-radius: 10px;
     }
 
-    #confetti {
+    #confetti, #sadEmojis {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 9999;
     }
 
-    #overlay {
+    #overlay, #loseOverlay {
       display: none;
       background-color: rgba(0, 0, 0, 0.85);
       position: fixed;
@@ -111,7 +111,7 @@
       animation: fadeIn 1s ease forwards;
     }
 
-    #overlay button {
+    #overlay button, #loseOverlay button {
       margin-top: 20px;
       padding: 10px 20px;
       background: gold;
@@ -149,10 +149,15 @@
   </div>
   <div id="message"></div>
   <div id="confetti"></div>
+  <div id="sadEmojis"></div>
   <div id="overlay">
     <p>مبروك! لقد فزت بالمستوى 🎉</p>
     <button onclick="resetGame()">🔁 إعادة اللعب</button>
     <button onclick="nextChallenge()">⏭️ التحدي التالي</button>
+  </div>
+  <div id="loseOverlay">
+    <p>😢 انتهت المحاولات! لم تجد الكنز.</p>
+    <button onclick="resetGame()">🔁 حاول مجددًا</button>
   </div>
   <div id="rules">
     <strong>قواعد اللعبة:</strong>
@@ -175,9 +180,12 @@ const grid = document.getElementById('grid');
 const attemptsSpan = document.getElementById('attempts');
 const message = document.getElementById('message');
 const overlay = document.getElementById('overlay');
+const loseOverlay = document.getElementById('loseOverlay');
 const confettiContainer = document.getElementById('confetti');
+const sadEmojis = document.getElementById('sadEmojis');
 const modeToggle = document.getElementById('modeToggle');
 let treasureIndex = Math.floor(Math.random() * 25);
+let gameOver = false;
 
 function createGrid() {
   grid.innerHTML = '';
@@ -191,6 +199,7 @@ function createGrid() {
 }
 
 function handleClick(e) {
+  if (gameOver) return;
   const index = +e.target.dataset.index;
   if (e.target.classList.contains('used')) return;
   attempts++;
@@ -201,13 +210,17 @@ function handleClick(e) {
     e.target.classList.add('treasure');
     message.textContent = '🎉 مبروك! لقد وجدت الكنز!';
     launchConfetti();
+    gameOver = true;
     setTimeout(() => {
       overlay.style.display = 'flex';
     }, 500);
   } else if (attempts >= maxAttempts) {
-    message.textContent = 'انتهت المحاولات! حاول مرة أخرى.';
     revealTreasure();
-    setTimeout(resetGame, 2000);
+    gameOver = true;
+    launchSadEmojis();
+    setTimeout(() => {
+      loseOverlay.style.display = 'flex';
+    }, 500);
   } else {
     const distance = Math.abs(index - treasureIndex);
     if (distance <= 2) e.target.classList.add('hint-very-close');
@@ -227,6 +240,10 @@ function resetGame() {
   treasureIndex = Math.floor(Math.random() * 25);
   message.textContent = '';
   overlay.style.display = 'none';
+  loseOverlay.style.display = 'none';
+  gameOver = false;
+  sadEmojis.innerHTML = '';
+  confettiContainer.innerHTML = '';
   createGrid();
 }
 
@@ -251,6 +268,23 @@ function launchConfetti() {
     setTimeout(() => {
       confetto.style.top = '100%';
     }, 0);
+  }
+}
+
+function launchSadEmojis() {
+  sadEmojis.innerHTML = '';
+  for (let i = 0; i < 50; i++) {
+    const emoji = document.createElement('div');
+    emoji.textContent = '😢';
+    emoji.style.position = 'absolute';
+    emoji.style.left = Math.random() * 100 + '%';
+    emoji.style.top = '-10%';
+    emoji.style.fontSize = '2rem';
+    emoji.style.transition = `top ${2 + Math.random() * 2}s ease-in`;
+    sadEmojis.appendChild(emoji);
+    requestAnimationFrame(() => {
+      emoji.style.top = '110%';
+    });
   }
 }
 
