@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مولد المقالب المخيفة - الإصدار الأول</title>
+    <title>مولد المقالب المخيفة - الإصدار المحسن</title>
     <style>
         * {
             box-sizing: border-box;
@@ -96,6 +96,17 @@
             margin-bottom: 10px;
         }
         
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-left: 10px;
+        }
+        
         button {
             background: var(--accent);
             color: white;
@@ -126,16 +137,10 @@
             position: relative;
         }
         
-        .scary-element {
-            font-size: 5rem;
-            animation: pulse 2s infinite;
+        #mediaElement {
+            max-width: 100%;
+            max-height: 100%;
             display: none;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
         }
         
         .countdown {
@@ -215,7 +220,6 @@
                     <div class="prank-type active" data-type="image">صورة مخيفة</div>
                     <div class="prank-type" data-type="video">فيديو مخيف</div>
                     <div class="prank-type" data-type="scream">صوت صراخ</div>
-                    <div class="prank-type" data-type="jumpscare">مفاجأة</div>
                 </div>
             </div>
             
@@ -226,6 +230,11 @@
                 
                 <label for="audioUrl">رابط الصوت (اختياري):</label>
                 <input type="url" id="audioUrl" placeholder="https://example.com/scream.mp3">
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="loopMedia">
+                    <label for="loopMedia">تكرار الصوت/الفيديو</label>
+                </div>
                 
                 <label for="delayTime">وقت التأخير (ثانية):</label>
                 <input type="text" id="delayTime" value="5" placeholder="5">
@@ -243,7 +252,8 @@
         </div>
         
         <div class="preview-content">
-            <div class="scary-element" id="scaryElement">👻</div>
+            <img id="mediaElement">
+            <video id="mediaVideo" controls style="display:none"></video>
             <div class="countdown" id="countdown">5</div>
         </div>
         <p id="previewText">سيظهر معاينة المقلب هنا بعد الإعدادات</p>
@@ -258,11 +268,11 @@
             <h3>كيفية الاستخدام:</h3>
             <p>1. اختر نوع المقلب من الخيارات المتاحة</p>
             <p>2. أدخل رابط الصورة أو الفيديو أو الصوت الذي تريد استخدامه</p>
-            <p>3. عيّن وقت التأخير قبل ظهور المقلب</p>
-            <p>4. انقر على "إنشاء رابط المقلب" لإنشاء الرابط القابل للمشاركة</p>
-            <p>5. استخدم "تجربة المقلب" لمعاينة النتيجة قبل الإرسال</p>
-            <p>6. انسخ الرابط وأرسله للضحية</p>
-            <p>ملاحظة: يمكنك استخدام أي خدمة استضافة ملفات للحصول على روابط لصورك وأصواتك</p>
+            <p>3. حدد إذا كنت تريد تكرار الصوت/الفيديو</p>
+            <p>4. عيّن وقت التأخير قبل ظهور المقلب</p>
+            <p>5. انقر على "إنشاء رابط المقلب" لإنشاء الرابط القابل للمشاركة</p>
+            <p>6. استخدم "تجربة المقلب" لمعاينة النتيجة قبل الإرسال</p>
+            <p>7. انسخ الرابط وأرسله للضحية</p>
         </div>
     </div>
 
@@ -272,6 +282,7 @@
             const prankTypes = document.querySelectorAll('.prank-type');
             const mediaUrlInput = document.getElementById('mediaUrl');
             const audioUrlInput = document.getElementById('audioUrl');
+            const loopMediaCheckbox = document.getElementById('loopMedia');
             const delayTimeInput = document.getElementById('delayTime');
             const prankTitleInput = document.getElementById('prankTitle');
             const generateBtn = document.getElementById('generateBtn');
@@ -279,13 +290,15 @@
             const resetBtn = document.getElementById('resetBtn');
             const generatedLink = document.getElementById('generatedLink');
             const copyBtn = document.getElementById('copyBtn');
-            const scaryElement = document.getElementById('scaryElement');
+            const mediaElement = document.getElementById('mediaElement');
+            const mediaVideo = document.getElementById('mediaVideo');
             const countdown = document.getElementById('countdown');
             const previewText = document.getElementById('previewText');
             
             // المتغيرات
             let currentPrankType = 'image';
             let generatedPrankUrl = '';
+            let audioElement = null;
             
             // تغيير نوع المقلب
             prankTypes.forEach(type => {
@@ -299,25 +312,19 @@
             
             // تحديث المعاينة
             function updatePreview() {
-                scaryElement.style.display = 'none';
+                mediaElement.style.display = 'none';
+                mediaVideo.style.display = 'none';
                 countdown.style.display = 'none';
                 
                 switch(currentPrankType) {
                     case 'image':
                         previewText.textContent = 'مقلب صورة مخيفة - سيظهر بعد وقت التأخير';
-                        scaryElement.textContent = '👻';
                         break;
                     case 'video':
                         previewText.textContent = 'مقلب فيديو مخيف - سيظهر بعد وقت التأخير';
-                        scaryElement.textContent = '📹';
                         break;
                     case 'scream':
                         previewText.textContent = 'مقلب صوتي - سيتم تشغيل صوت مرعب بعد وقت التأخير';
-                        scaryElement.textContent = '🔊';
-                        break;
-                    case 'jumpscare':
-                        previewText.textContent = 'مقلب مفاجأة - سيظهر عنصر مخيف فجأة';
-                        scaryElement.textContent = '👻';
                         break;
                 }
             }
@@ -326,6 +333,7 @@
             generateBtn.addEventListener('click', function() {
                 const mediaUrl = mediaUrlInput.value.trim();
                 const audioUrl = audioUrlInput.value.trim();
+                const loopMedia = loopMediaCheckbox.checked;
                 const delayTime = delayTimeInput.value.trim() || '5';
                 const title = prankTitleInput.value.trim() || 'صفحة مهمة';
                 
@@ -339,13 +347,14 @@
                 
                 // إنشاء رابط المقلب
                 const currentUrl = window.location.href.split('?')[0];
-                generatedPrankUrl = `${currentUrl}?prank=true&id=${prankId}&type=${currentPrankType}&media=${encodeURIComponent(mediaUrl)}&audio=${encodeURIComponent(audioUrl)}&delay=${delayTime}&title=${encodeURIComponent(title)}`;
+                generatedPrankUrl = `${currentUrl}?prank=true&id=${prankId}&type=${currentPrankType}&media=${encodeURIComponent(mediaUrl)}&audio=${encodeURIComponent(audioUrl)}&loop=${loopMedia}&delay=${delayTime}&title=${encodeURIComponent(title)}`;
                 
                 // حفظ بيانات المقلب في localStorage
                 const prankData = {
                     type: currentPrankType,
                     mediaUrl: mediaUrl,
                     audioUrl: audioUrl,
+                    loopMedia: loopMedia,
                     delayTime: delayTime,
                     title: title
                 };
@@ -380,10 +389,12 @@
             testBtn.addEventListener('click', function() {
                 const mediaUrl = mediaUrlInput.value.trim();
                 const audioUrl = audioUrlInput.value.trim();
+                const loopMedia = loopMediaCheckbox.checked;
                 const delayTime = parseInt(delayTimeInput.value.trim() || '5');
                 
                 // إخفاء كل العناصر أولاً
-                scaryElement.style.display = 'none';
+                mediaElement.style.display = 'none';
+                mediaVideo.style.display = 'none';
                 
                 // عرض العد التنازلي
                 countdown.style.display = 'block';
@@ -398,60 +409,60 @@
                     if (count <= 0) {
                         clearInterval(countdownInterval);
                         countdown.style.display = 'none';
-                        executePrank(mediaUrl, audioUrl, currentPrankType);
+                        executePrank(mediaUrl, audioUrl, loopMedia, currentPrankType);
                     }
                 }, 1000);
             });
             
             // تنفيذ المقلب
-            function executePrank(mediaUrl, audioUrl, type) {
+            function executePrank(mediaUrl, audioUrl, loopMedia, type) {
+                // إيقاف أي وسائط تعمل حالياً
+                if (audioElement) {
+                    audioElement.pause();
+                    audioElement = null;
+                }
+                mediaVideo.pause();
+                
                 switch(type) {
                     case 'image':
                         if (mediaUrl) {
-                            scaryElement.textContent = '👻';
-                            scaryElement.style.display = 'block';
+                            mediaElement.src = mediaUrl;
+                            mediaElement.style.display = 'block';
                             previewText.textContent = 'مقلب صورة مخيفة!';
-                            // يمكن تحميل الصورة هنا إذا كانت متاحة عبر CORS
                         } else {
-                            scaryElement.textContent = '❌';
-                            scaryElement.style.display = 'block';
                             previewText.textContent = 'لم يتم توفير رابط صورة!';
                         }
-                        playAudio(audioUrl);
+                        playAudio(audioUrl, loopMedia);
                         break;
                     case 'video':
                         if (mediaUrl) {
-                            scaryElement.textContent = '📹';
-                            scaryElement.style.display = 'block';
+                            mediaVideo.src = mediaUrl;
+                            mediaVideo.loop = loopMedia;
+                            mediaVideo.style.display = 'block';
+                            mediaVideo.play().catch(e => {
+                                console.error('تعذر تشغيل الفيديو:', e);
+                                previewText.textContent = 'تعذر تشغيل الفيديو. قد يكون الرابط غير صالح.';
+                            });
                             previewText.textContent = 'مقلب فيديو مخيف!';
                         } else {
-                            scaryElement.textContent = '❌';
-                            scaryElement.style.display = 'block';
                             previewText.textContent = 'لم يتم توفير رابط فيديو!';
                         }
-                        playAudio(audioUrl);
+                        playAudio(audioUrl, loopMedia);
                         break;
                     case 'scream':
-                        scaryElement.textContent = '🔊';
-                        scaryElement.style.display = 'block';
                         previewText.textContent = 'مقلب صوتي مخيف!';
-                        playAudio(audioUrl);
-                        break;
-                    case 'jumpscare':
-                        scaryElement.textContent = '👻';
-                        scaryElement.style.display = 'block';
-                        previewText.textContent = 'مفاجأة!';
-                        playAudio(audioUrl);
+                        playAudio(mediaUrl, loopMedia);
                         break;
                 }
             }
             
             // تشغيل الصوت
-            function playAudio(audioUrl) {
+            function playAudio(audioUrl, loop) {
                 if (audioUrl) {
-                    const audio = new Audio(audioUrl);
-                    audio.play().catch(e => {
-                        console.log('تعذر تشغيل الصوت تلقائياً. يحتاج المستخدم إلى التفاعل أولاً.');
+                    audioElement = new Audio(audioUrl);
+                    audioElement.loop = loop;
+                    audioElement.play().catch(e => {
+                        console.log('تعذر تشغيل الصوت تلقائياً:', e);
                     });
                 }
             }
@@ -460,13 +471,22 @@
             resetBtn.addEventListener('click', function() {
                 mediaUrlInput.value = '';
                 audioUrlInput.value = '';
+                loopMediaCheckbox.checked = false;
                 delayTimeInput.value = '5';
                 prankTitleInput.value = '';
                 generatedLink.textContent = 'سيظهر هنا بعد الإنشاء';
                 copyBtn.style.display = 'none';
                 
-                scaryElement.style.display = 'none';
+                mediaElement.style.display = 'none';
+                mediaVideo.style.display = 'none';
                 countdown.style.display = 'none';
+                
+                // إيقاف أي وسائط تعمل
+                if (audioElement) {
+                    audioElement.pause();
+                    audioElement = null;
+                }
+                mediaVideo.pause();
                 
                 previewText.textContent = 'سيظهر معاينة المقلب هنا بعد الإعدادات';
                 
@@ -496,8 +516,8 @@
                             document.title = data.title;
                             
                             // إخفاء واجهة التحكم
-                            document.querySelector('.container').innerHTML = `
-                                <div style="text-align: center; padding: 50px;">
+                            document.body.innerHTML = `
+                                <div style="text-align: center; padding: 50px; background: black; color: white; height: 100vh; display: flex; flex-direction: column; justify-content: center;">
                                     <h1>${data.title}</h1>
                                     <p>جاري التحميل، الرجاء الانتظار...</p>
                                     <div class="countdown" style="font-size: 5rem;">${delayTime}</div>
@@ -533,62 +553,55 @@
                 document.body.style.justifyContent = 'center';
                 document.body.style.height = '100vh';
                 document.body.style.overflow = 'hidden';
+                document.body.style.flexDirection = 'column';
                 
                 switch(data.type) {
                     case 'image':
-                        const imgElement = document.createElement('div');
-                        imgElement.textContent = '👻';
-                        imgElement.style.fontSize = '10rem';
-                        imgElement.style.animation = 'pulse 0.5s infinite';
-                        document.body.appendChild(imgElement);
+                        if (data.mediaUrl) {
+                            const img = document.createElement('img');
+                            img.src = data.mediaUrl;
+                            img.style.maxWidth = '100%';
+                            img.style.maxHeight = '70%';
+                            document.body.appendChild(img);
+                        }
+                        break;
                         
-                        if (data.audioUrl) {
-                            const audio = new Audio(data.audioUrl);
-                            audio.play();
+                    case 'video':
+                        if (data.mediaUrl) {
+                            const video = document.createElement('video');
+                            video.src = data.mediaUrl;
+                            video.autoplay = true;
+                            video.controls = false;
+                            video.loop = data.loopMedia || false;
+                            video.style.width = '100%';
+                            video.style.maxHeight = '70%';
+                            document.body.appendChild(video);
                         }
                         break;
                         
                     case 'scream':
-                        if (data.audioUrl) {
-                            const audio = new Audio(data.audioUrl);
-                            audio.play();
-                            const soundElement = document.createElement('div');
-                            soundElement.textContent = '🔊';
-                            soundElement.style.fontSize = '10rem';
-                            document.body.appendChild(soundElement);
-                        }
-                        break;
-                        
-                    case 'jumpscare':
-                        const jumpElement = document.createElement('div');
-                        jumpElement.textContent = '👻';
-                        jumpElement.style.fontSize = '10rem';
-                        jumpElement.style.animation = 'pulse 0.2s infinite';
-                        document.body.appendChild(jumpElement);
-                        
-                        if (data.audioUrl) {
-                            const audio = new Audio(data.audioUrl);
-                            audio.play();
-                        }
+                        const soundIcon = document.createElement('div');
+                        soundIcon.textContent = '🔊';
+                        soundIcon.style.fontSize = '10rem';
+                        document.body.appendChild(soundIcon);
                         break;
                 }
                 
-                // إضافة زر للخروج
-                const exitBtn = document.createElement('button');
-                exitBtn.textContent = 'خروج';
-                exitBtn.style.position = 'absolute';
-                exitBtn.style.top = '20px';
-                exitBtn.style.right = '20px';
-                exitBtn.style.padding = '10px 20px';
-                exitBtn.style.background = 'red';
-                exitBtn.style.color = 'white';
-                exitBtn.style.border = 'none';
-                exitBtn.style.borderRadius = '5px';
-                exitBtn.style.cursor = 'pointer';
-                exitBtn.onclick = function() {
-                    window.location.href = window.location.href.split('?')[0];
-                };
-                document.body.appendChild(exitBtn);
+                if (data.audioUrl) {
+                    const audio = new Audio(data.audioUrl);
+                    audio.loop = data.loopMedia || false;
+                    audio.play().catch(e => {
+                        console.log('تعذر تشغيل الصوت:', e);
+                    });
+                }
+                
+                // إضافة رسالة للمستخدم
+                const message = document.createElement('div');
+                message.textContent = 'للعودة، اضغط على زر الرجوع في المتصفح';
+                message.style.color = 'white';
+                message.style.marginTop = '20px';
+                message.style.fontSize = '1.2rem';
+                document.body.appendChild(message);
             }
             
             // التحقق عند تحميل الصفحة إذا كانت صفحة مقلب
