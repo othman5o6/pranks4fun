@@ -214,8 +214,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>مولد المقالب المخيفة</h1>
-            <p class="subtitle">أنشئ روابط مقالب مرعبة بأصواتك وصورك الخاصة!</p>
+            <h1>صانع المقاقلب</h1>
+            <p class="subtitle">أنشئ روابط مقالب بصور و اصوات!</p>
         </header>
         
         <div class="control-panel">
@@ -307,12 +307,7 @@
             let isUserInteracted = false;
             
             // تفعيل الصوت عند التفاعل الأول مع الصفحة
-            document.addEventListener('click', function() {
-                if (!isUserInteracted) {
-                    isUserInteracted = true;
-                    console.log("تم تفعيل الصوت بعد تفاعل المستخدم");
-                }
-            }, { once: true });
+    
             
             // تغيير نوع المقلب
             prankTypes.forEach(type => {
@@ -485,23 +480,7 @@
                             // محاولة بديلة: طلب تفاعل المستخدم
                             previewText.textContent += ' - انقر مرة أخرى لتشغيل الصوت';
                             
-                            // إضافة زر لتشغيل الصوت يدوياً
-                            const playButton = document.createElement('button');
-                            playButton.textContent = 'تشغيل الصوت';
-                            playButton.style.marginTop = '10px';
-                            playButton.onclick = function() {
-                                audioElement.play().catch(e => {
-                                    console.error('لا يزال تعذر تشغيل الصوت:', e);
-                                });
-                                this.remove();
-                            };
-                            document.querySelector('.preview-content').appendChild(playButton);
-                        });
-                    }
-                } else if (audioUrl && !isUserInteracted) {
-                    previewText.textContent += ' - انقر على الصفحة أولاً ثم جرب مرة أخرى';
-                }
-            }
+                          
             
             // مسح كل شيء
             resetBtn.addEventListener('click', function() {
@@ -641,13 +620,7 @@
                         break;
                 }
                 
-                // إضافة رسالة للمستخدم
-                const message = document.createElement('div');
-                message.style.color = 'white';
-                message.style.marginTop = '20px';
-                message.style.fontSize = '1.2rem';
-                document.body.appendChild(message);
-            }
+            
             
             // التحقق عند تحميل الصفحة إذا كانت صفحة مقلب
             if (!checkIfPrankPage()) {
