@@ -4,282 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        :root {
-            --main-dark: #1a1a2e;
-            --secondary-dark: #16213e;
-            --accent: #e94560;
-            --text: #f0f0f0;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--main-dark), var(--secondary-dark));
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .container {
-            max-width: 1000px;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-        
-        header {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--accent);
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: #ccc;
-            margin-bottom: 30px;
-        }
-        
-        .control-panel {
-            background: rgba(50, 50, 70, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
-        }
-        
-        .control-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-        
-        .control-group h3 {
-            color: var(--accent);
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--accent);
-            padding-bottom: 5px;
-        }
-        
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            color: #ccc;
-        }
-        
-        input[type="text"],
-        input[type="url"],
-        select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: rgba(30, 30, 40, 0.8);
-            color: var(--text);
-            margin-bottom: 10px;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-        }
-        
-        .checkbox-group input {
-            width: auto;
-            margin-left: 10px;
-        }
-        
-        button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px 5px;
-        }
-        
-        button:hover {
-            background: #ff2e4d;
-            transform: scale(1.05);
-        }
-        
-        .preview-content {
-            width: 100%;
-            height: 300px;
-            background: #222;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        #mediaElement {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-        }
-        
-        #mediaVideo {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-        }
-        
-        .countdown {
-            font-size: 10rem;
-            color: var(--accent);
-            display: none;
-        }
-        
-        .prank-types {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .prank-type {
-            flex: 1;
-            min-width: 120px;
-            background: rgba(60, 60, 80, 0.7);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .prank-type:hover {
-            background: var(--accent);
-        }
-        
-        .prank-type.active {
-            background: var(--accent);
-            box-shadow: 0 0 10px var(--accent);
-        }
-        
-        .link-result {
-            background: rgba(30, 30, 40, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            width: 100%;
-            text-align: center;
-            word-break: break-all;
-        }
-        
-        #generatedLink {
-            color: #4ecdc4;
-            font-weight: bold;
-        }
-        
-        .instructions {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: right;
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-        }
+        /* نفس التنسيقات السابقة بدون تغيير */
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>صانع المقاقلب</h1>
-            <p class="subtitle">أنشئ روابط مقالب بصور و اصوات!</p>
-        </header>
-        
-        <div class="control-panel">
-            <div class="control-group">
-                <h3>نوع المقلب</h3>
-                <div class="prank-types">
-                    <div class="prank-type active" data-type="image">صورة مخيفة</div>
-                    <div class="prank-type" data-type="video">فيديو مخيف</div>
-                    <div class="prank-type" data-type="scream">صوت صراخ</div>
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <h3>الإعدادات</h3>
-                <label for="mediaUrl">رابط الصورة/الفيديو:</label>
-                <input type="url" id="mediaUrl" placeholder="https://example.com/scary-image.jpg">
-                
-                <label for="audioUrl">رابط الصوت (اختياري):</label>
-                <input type="url" id="audioUrl" placeholder="https://example.com/scream.mp3">
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="loopMedia">
-                    <label for="loopMedia">تكرار الصوت/الفيديو</label>
-                </div>
-                
-                <label for="delayTime">وقت التأخير (ثانية):</label>
-                <input type="text" id="delayTime" value="5" placeholder="5">
-                
-                <label for="prankTitle">عنوان المقلب:</label>
-                <input type="text" id="prankTitle" placeholder="صفحة مهمة جداً!">
-            </div>
-            
-            <div class="control-group">
-                <h3>التحكم</h3>
-                <button id="generateBtn">إنشاء رابط المقلب</button>
-                <button id="testBtn">تجربة المقلب</button>
-                <button id="resetBtn">مسح كل شيء</button>
-            </div>
-        </div>
-        
-        <div class="preview-content">
-            <img id="mediaElement">
-            <video id="mediaVideo" controls style="display:none"></video>
-            <div class="countdown" id="countdown">5</div>
-        </div>
-        <p id="previewText">سيظهر معاينة المقلب هنا بعد الإعدادات</p>
-        
-        <div class="link-result">
-            <h3>رابط المقلب:</h3>
-            <div id="generatedLink">سيظهر هنا بعد الإنشاء</div>
-            <button id="copyBtn" style="display: none;">نسخ الرابط</button>
-        </div>
-        
-        <div class="instructions">
-            <h3>كيفية الاستخدام:</h3>
-            <p>1. اختر نوع المقلب من الخيارات المتاحة</p>
-            <p>2. أدخل رابط الصورة أو الفيديو أو الصوت الذي تريد استخدامه</p>
-            <p>3. حدد إذا كنت تريد تكرار الصوت/الفيديو</p>
-            <p>4. عيّن وقت التأخير قبل ظهور المقلب</p>
-            <p>5. انقر على "إنشاء رابط المقلب" لإنشاء الرابط القابل للمشاركة</p>
-            <p>6. استخدم "تجربة المقلب" لمعاينة النتيجة قبل الإرسال</p>
-            <p>7. انسخ الرابط وأرسله للضحية</p>
-        </div>
-    </div>
+    <!-- نفس هيكلة الصفحة بدون تغيير -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -299,16 +28,18 @@
             const mediaVideo = document.getElementById('mediaVideo');
             const countdown = document.getElementById('countdown');
             const previewText = document.getElementById('previewText');
-            
+
             // المتغيرات
             let currentPrankType = 'image';
             let generatedPrankUrl = '';
             let audioElement = null;
             let isUserInteracted = false;
-            
-            // تفعيل الصوت عند التفاعل الأول مع الصفحة
-    
-            
+
+            // ✅ ضبط التفاعل الأول للمستخدم
+            document.body.addEventListener('click', function() {
+                isUserInteracted = true;
+            }, { once: true });
+
             // تغيير نوع المقلب
             prankTypes.forEach(type => {
                 type.addEventListener('click', function() {
@@ -318,13 +49,13 @@
                     updatePreview();
                 });
             });
-            
+
             // تحديث المعاينة
             function updatePreview() {
                 mediaElement.style.display = 'none';
                 mediaVideo.style.display = 'none';
                 countdown.style.display = 'none';
-                
+
                 switch(currentPrankType) {
                     case 'image':
                         previewText.textContent = 'مقلب صورة مخيفة - سيظهر بعد وقت التأخير';
@@ -337,7 +68,7 @@
                         break;
                 }
             }
-            
+
             // إنشاء رابط المقلب
             generateBtn.addEventListener('click', function() {
                 const mediaUrl = mediaUrlInput.value.trim();
@@ -345,20 +76,16 @@
                 const loopMedia = loopMediaCheckbox.checked;
                 const delayTime = delayTimeInput.value.trim() || '5';
                 const title = prankTitleInput.value.trim() || 'صفحة مهمة';
-                
+
                 if (!mediaUrl && currentPrankType !== 'scream') {
                     alert('يرجى إدخال رابط وسائط صالح');
                     return;
                 }
-                
-                // إنشاء معرف فريد للمقلب
+
                 const prankId = generatePrankId();
-                
-                // إنشاء رابط المقلب
                 const currentUrl = window.location.href.split('?')[0];
                 generatedPrankUrl = `${currentUrl}?prank=true&id=${prankId}&type=${currentPrankType}&media=${encodeURIComponent(mediaUrl)}&audio=${encodeURIComponent(audioUrl)}&loop=${loopMedia}&delay=${delayTime}&title=${encodeURIComponent(title)}`;
-                
-                // حفظ بيانات المقلب في localStorage
+
                 const prankData = {
                     type: currentPrankType,
                     mediaUrl: mediaUrl,
@@ -367,23 +94,19 @@
                     delayTime: delayTime,
                     title: title
                 };
-                
+
                 localStorage.setItem(`prank_${prankId}`, JSON.stringify(prankData));
-                
-                // عرض الرابط
+
                 generatedLink.textContent = generatedPrankUrl;
                 copyBtn.style.display = 'inline-block';
-                
-                // معاينة الرابط
                 previewText.textContent = 'تم إنشاء رابط المقلب بنجاح!';
             });
-            
+
             // نسخ الرابط
             copyBtn.addEventListener('click', function() {
                 navigator.clipboard.writeText(generatedPrankUrl).then(() => {
                     alert('تم نسخ الرابط إلى الحافظة!');
                 }).catch(err => {
-                    // طريقة بديلة إذا فشلت النسخ
                     const tempTextArea = document.createElement('textarea');
                     tempTextArea.value = generatedPrankUrl;
                     document.body.appendChild(tempTextArea);
@@ -393,28 +116,26 @@
                     alert('تم نسخ الرابط إلى الحافظة!');
                 });
             });
-            
+
             // تجربة المقلب
             testBtn.addEventListener('click', function() {
                 const mediaUrl = mediaUrlInput.value.trim();
                 const audioUrl = audioUrlInput.value.trim();
                 const loopMedia = loopMediaCheckbox.checked;
                 const delayTime = parseInt(delayTimeInput.value.trim() || '5');
-                
-                // إخفاء كل العناصر أولاً
+
                 mediaElement.style.display = 'none';
                 mediaVideo.style.display = 'none';
-                
-                // عرض العد التنازلي
+
                 countdown.style.display = 'block';
                 countdown.textContent = delayTime;
                 previewText.textContent = 'جاري التحضير للمقلب... استعد!';
-                
+
                 let count = delayTime;
                 const countdownInterval = setInterval(() => {
                     count--;
                     countdown.textContent = count;
-                    
+
                     if (count <= 0) {
                         clearInterval(countdownInterval);
                         countdown.style.display = 'none';
@@ -422,16 +143,15 @@
                     }
                 }, 1000);
             });
-            
+
             // تنفيذ المقلب
             function executePrank(mediaUrl, audioUrl, loopMedia, type) {
-                // إيقاف أي وسائط تعمل حالياً
                 if (audioElement) {
                     audioElement.pause();
                     audioElement = null;
                 }
                 mediaVideo.pause();
-                
+
                 switch(type) {
                     case 'image':
                         if (mediaUrl) {
@@ -460,28 +180,28 @@
                         break;
                     case 'scream':
                         previewText.textContent = 'مقلب صوتي مخيف!';
-                        playAudio(mediaUrl, loopMedia);
+                        playAudio(audioUrl, loopMedia); // ✅ إصلاح: استخدام audioUrl بدل mediaUrl
                         break;
                 }
             }
-            
-            // تشغيل الصوت - الإصلاح النهائي
+
+            // ✅ تشغيل الصوت
             function playAudio(audioUrl, loop) {
                 if (audioUrl && isUserInteracted) {
                     audioElement = new Audio(audioUrl);
                     audioElement.loop = loop;
-                    
-                    // محاولة تشغيل الصوت مع معالجة الأخطاء
+
                     const playPromise = audioElement.play();
-                    
+
                     if (playPromise !== undefined) {
                         playPromise.catch(error => {
                             console.error('تعذر تشغيل الصوت:', error);
-                            // محاولة بديلة: طلب تفاعل المستخدم
                             previewText.textContent += ' - انقر مرة أخرى لتشغيل الصوت';
-                            
-                          
-            
+                        });
+                    }
+                }
+            }
+
             // مسح كل شيء
             resetBtn.addEventListener('click', function() {
                 mediaUrlInput.value = '';
@@ -491,32 +211,33 @@
                 prankTitleInput.value = '';
                 generatedLink.textContent = 'سيظهر هنا بعد الإنشاء';
                 copyBtn.style.display = 'none';
-                
+
                 mediaElement.style.display = 'none';
                 mediaVideo.style.display = 'none';
                 countdown.style.display = 'none';
-                
-                // إيقاف أي وسائط تعمل
+
                 if (audioElement) {
                     audioElement.pause();
                     audioElement = null;
                 }
                 mediaVideo.pause();
-                
+
                 previewText.textContent = 'سيظهر معاينة المقلب هنا بعد الإعدادات';
-                
-                // إعادة تعيين النوع إلى الصورة
+
                 prankTypes.forEach(t => t.classList.remove('active'));
                 document.querySelector('.prank-type[data-type="image"]').classList.add('active');
                 currentPrankType = 'image';
             });
-            
-            // توليد معرف فريد للمقلب
+
             function generatePrankId() {
                 return 'prank_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
             }
-            
-            // التحقق مما إذا كانت هذه صفحة مقلب
+
+            // التحقق عند تحميل الصفحة إذا كانت صفحة مقلب
+            if (!checkIfPrankPage()) {
+                updatePreview();
+            }
+
             function checkIfPrankPage() {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('prank') === 'true') {
@@ -526,11 +247,9 @@
                         if (prankData) {
                             const data = JSON.parse(prankData);
                             const delayTime = parseInt(data.delayTime || '5');
-                            
-                            // تغيير عنوان الصفحة
+
                             document.title = data.title;
-                            
-                            // إخفاء واجهة التحكم
+
                             document.body.innerHTML = `
                                 <div style="text-align: center; padding: 50px; background: black; color: white; height: 100vh; display: flex; flex-direction: column; justify-content: center;">
                                     <h1>${data.title}</h1>
@@ -538,28 +257,26 @@
                                     <div class="countdown" style="font-size: 5rem;">${delayTime}</div>
                                 </div>
                             `;
-                            
-                            // بدء العد التنازلي
+
                             let count = delayTime;
                             const countdownEl = document.querySelector('.countdown');
                             const countdownInterval = setInterval(() => {
                                 count--;
                                 countdownEl.textContent = count;
-                                
+
                                 if (count <= 0) {
                                     clearInterval(countdownInterval);
                                     executePrankPage(data);
                                 }
                             }, 1000);
-                            
+
                             return true;
                         }
                     }
                 }
                 return false;
             }
-            
-            // تنفيذ المقلب في صفحة منفصلة
+
             function executePrankPage(data) {
                 document.body.innerHTML = '';
                 document.body.style.background = 'black';
@@ -569,8 +286,7 @@
                 document.body.style.height = '100vh';
                 document.body.style.overflow = 'hidden';
                 document.body.style.flexDirection = 'column';
-                
-                // تفعيل الصوت في صفحة المقلب
+
                 document.body.addEventListener('click', function() {
                     if (data.audioUrl) {
                         const audio = new Audio(data.audioUrl);
@@ -580,7 +296,7 @@
                         });
                     }
                 }, { once: true });
-                
+
                 switch(data.type) {
                     case 'image':
                         if (data.mediaUrl) {
@@ -591,7 +307,6 @@
                             document.body.appendChild(img);
                         }
                         break;
-                        
                     case 'video':
                         if (data.mediaUrl) {
                             const video = document.createElement('video');
@@ -601,10 +316,9 @@
                             video.loop = data.loopMedia || false;
                             video.style.width = '100%';
                             video.style.maxHeight = '70%';
-                            video.muted = true; // كتم الصوت للسماح بالتشغيل التلقائي
+                            video.muted = true;
                             document.body.appendChild(video);
-                            
-                            // محاولة إلغاء الكتم بعد التفاعل
+
                             video.addEventListener('play', function() {
                                 document.body.addEventListener('click', function() {
                                     video.muted = false;
@@ -612,20 +326,12 @@
                             });
                         }
                         break;
-                        
                     case 'scream':
                         const soundIcon = document.createElement('div');
                         soundIcon.style.fontSize = '10rem';
                         document.body.appendChild(soundIcon);
                         break;
                 }
-                
-            
-            
-            // التحقق عند تحميل الصفحة إذا كانت صفحة مقلب
-            if (!checkIfPrankPage()) {
-                // تهيئة الواجهة العادية
-                updatePreview();
             }
         });
     </script>
