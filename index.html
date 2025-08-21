@@ -1,56 +1,89 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منشئ المقالب</title>
     <style>
-        /* نفس التنسيقات السابقة بدون تغيير */
+        body { font-family: Arial, sans-serif; direction: rtl; }
+        .active { font-weight: bold; }
+        #copyBtn { display: none; }
+        #mediaElement, #mediaVideo { display: none; max-width: 100%; }
+        #countdown { font-size: 3rem; display: none; }
     </style>
 </head>
 <body>
-    <!-- نفس هيكلة الصفحة بدون تغيير -->
+    <h1>منشئ المقالب</h1>
+    <div>
+        <label>نوع المقلب:</label>
+        <button class="prank-type active" data-type="image">صورة</button>
+        <button class="prank-type" data-type="video">فيديو</button>
+        <button class="prank-type" data-type="scream">صوت</button>
+    </div>
+    <div>
+        <label>رابط الوسائط:</label>
+        <input type="text" id="mediaUrlInput">
+    </div>
+    <div>
+        <label>رابط الصوت:</label>
+        <input type="text" id="audioUrlInput">
+    </div>
+    <div>
+        <label>تكرار الوسائط:</label>
+        <input type="checkbox" id="loopMediaCheckbox">
+    </div>
+    <div>
+        <label>وقت التأخير (ثواني):</label>
+        <input type="number" id="delayTimeInput" value="5">
+    </div>
+    <div>
+        <label>عنوان المقلب:</label>
+        <input type="text" id="prankTitleInput" placeholder="صفحة مهمة">
+    </div>
+    <button id="generateBtn">إنشاء رابط المقلب</button>
+    <button id="testBtn">تجربة المقلب</button>
+    <button id="resetBtn">إعادة ضبط</button>
+    <p id="previewText">سيظهر معاينة المقلب هنا بعد الإعدادات</p>
+    <p id="generatedLink">سيظهر هنا بعد الإنشاء</p>
+    <button id="copyBtn">نسخ الرابط</button>
+    <img id="mediaElement">
+    <video id="mediaVideo" controls></video>
+    <div id="countdown"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // العناصر الأساسية
             const prankTypes = document.querySelectorAll('.prank-type');
-            const mediaUrlInput = document.getElementById('mediaUrl');
-            const audioUrlInput = document.getElementById('audioUrl');
-            const loopMediaCheckbox = document.getElementById('loopMedia');
-            const delayTimeInput = document.getElementById('delayTime');
-            const prankTitleInput = document.getElementById('prankTitle');
+            const mediaUrlInput = document.getElementById('mediaUrlInput');
+            const audioUrlInput = document.getElementById('audioUrlInput');
+            const loopMediaCheckbox = document.getElementById('loopMediaCheckbox');
+            const delayTimeInput = document.getElementById('delayTimeInput');
+            const prankTitleInput = document.getElementById('prankTitleInput');
             const generateBtn = document.getElementById('generateBtn');
             const testBtn = document.getElementById('testBtn');
             const resetBtn = document.getElementById('resetBtn');
+            const previewText = document.getElementById('previewText');
             const generatedLink = document.getElementById('generatedLink');
             const copyBtn = document.getElementById('copyBtn');
             const mediaElement = document.getElementById('mediaElement');
             const mediaVideo = document.getElementById('mediaVideo');
             const countdown = document.getElementById('countdown');
-            const previewText = document.getElementById('previewText');
 
-            // المتغيرات
             let currentPrankType = 'image';
-            let generatedPrankUrl = '';
             let audioElement = null;
+            let generatedPrankUrl = '';
             let isUserInteracted = false;
 
-            // ✅ ضبط التفاعل الأول للمستخدم
-            document.body.addEventListener('click', function() {
-                isUserInteracted = true;
-            }, { once: true });
+            document.body.addEventListener('click', () => { isUserInteracted = true; }, { once: true });
 
-            // تغيير نوع المقلب
-            prankTypes.forEach(type => {
-                type.addEventListener('click', function() {
+            prankTypes.forEach(button => {
+                button.addEventListener('click', () => {
                     prankTypes.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    currentPrankType = this.dataset.type;
+                    button.classList.add('active');
+                    currentPrankType = button.dataset.type;
                     updatePreview();
                 });
             });
 
-            // تحديث المعاينة
             function updatePreview() {
                 mediaElement.style.display = 'none';
                 mediaVideo.style.display = 'none';
@@ -69,7 +102,6 @@
                 }
             }
 
-            // إنشاء رابط المقلب
             generateBtn.addEventListener('click', function() {
                 const mediaUrl = mediaUrlInput.value.trim();
                 const audioUrl = audioUrlInput.value.trim();
@@ -96,17 +128,15 @@
                 };
 
                 localStorage.setItem(`prank_${prankId}`, JSON.stringify(prankData));
-
                 generatedLink.textContent = generatedPrankUrl;
                 copyBtn.style.display = 'inline-block';
                 previewText.textContent = 'تم إنشاء رابط المقلب بنجاح!';
             });
 
-            // نسخ الرابط
             copyBtn.addEventListener('click', function() {
                 navigator.clipboard.writeText(generatedPrankUrl).then(() => {
                     alert('تم نسخ الرابط إلى الحافظة!');
-                }).catch(err => {
+                }).catch(() => {
                     const tempTextArea = document.createElement('textarea');
                     tempTextArea.value = generatedPrankUrl;
                     document.body.appendChild(tempTextArea);
@@ -117,7 +147,6 @@
                 });
             });
 
-            // تجربة المقلب
             testBtn.addEventListener('click', function() {
                 const mediaUrl = mediaUrlInput.value.trim();
                 const audioUrl = audioUrlInput.value.trim();
@@ -135,7 +164,6 @@
                 const countdownInterval = setInterval(() => {
                     count--;
                     countdown.textContent = count;
-
                     if (count <= 0) {
                         clearInterval(countdownInterval);
                         countdown.style.display = 'none';
@@ -144,12 +172,8 @@
                 }, 1000);
             });
 
-            // تنفيذ المقلب
             function executePrank(mediaUrl, audioUrl, loopMedia, type) {
-                if (audioElement) {
-                    audioElement.pause();
-                    audioElement = null;
-                }
+                if (audioElement) { audioElement.pause(); audioElement = null; }
                 mediaVideo.pause();
 
                 switch(type) {
@@ -158,8 +182,6 @@
                             mediaElement.src = mediaUrl;
                             mediaElement.style.display = 'block';
                             previewText.textContent = 'مقلب صورة مخيفة!';
-                        } else {
-                            previewText.textContent = 'لم يتم توفير رابط صورة!';
                         }
                         playAudio(audioUrl, loopMedia);
                         break;
@@ -168,41 +190,30 @@
                             mediaVideo.src = mediaUrl;
                             mediaVideo.loop = loopMedia;
                             mediaVideo.style.display = 'block';
-                            mediaVideo.play().catch(e => {
-                                console.error('تعذر تشغيل الفيديو:', e);
+                            mediaVideo.play().catch(() => {
                                 previewText.textContent = 'تعذر تشغيل الفيديو. قد يكون الرابط غير صالح.';
                             });
                             previewText.textContent = 'مقلب فيديو مخيف!';
-                        } else {
-                            previewText.textContent = 'لم يتم توفير رابط فيديو!';
                         }
                         playAudio(audioUrl, loopMedia);
                         break;
                     case 'scream':
                         previewText.textContent = 'مقلب صوتي مخيف!';
-                        playAudio(audioUrl, loopMedia); // ✅ إصلاح: استخدام audioUrl بدل mediaUrl
+                        playAudio(mediaUrl, loopMedia);
                         break;
                 }
             }
 
-            // ✅ تشغيل الصوت
             function playAudio(audioUrl, loop) {
                 if (audioUrl && isUserInteracted) {
                     audioElement = new Audio(audioUrl);
                     audioElement.loop = loop;
-
-                    const playPromise = audioElement.play();
-
-                    if (playPromise !== undefined) {
-                        playPromise.catch(error => {
-                            console.error('تعذر تشغيل الصوت:', error);
-                            previewText.textContent += ' - انقر مرة أخرى لتشغيل الصوت';
-                        });
-                    }
+                    audioElement.play().catch(() => {
+                        previewText.textContent += ' - انقر مرة أخرى لتشغيل الصوت';
+                    });
                 }
             }
 
-            // مسح كل شيء
             resetBtn.addEventListener('click', function() {
                 mediaUrlInput.value = '';
                 audioUrlInput.value = '';
@@ -211,19 +222,12 @@
                 prankTitleInput.value = '';
                 generatedLink.textContent = 'سيظهر هنا بعد الإنشاء';
                 copyBtn.style.display = 'none';
-
                 mediaElement.style.display = 'none';
                 mediaVideo.style.display = 'none';
                 countdown.style.display = 'none';
-
-                if (audioElement) {
-                    audioElement.pause();
-                    audioElement = null;
-                }
+                if (audioElement) { audioElement.pause(); audioElement = null; }
                 mediaVideo.pause();
-
                 previewText.textContent = 'سيظهر معاينة المقلب هنا بعد الإعدادات';
-
                 prankTypes.forEach(t => t.classList.remove('active'));
                 document.querySelector('.prank-type[data-type="image"]').classList.add('active');
                 currentPrankType = 'image';
@@ -231,11 +235,6 @@
 
             function generatePrankId() {
                 return 'prank_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            }
-
-            // التحقق عند تحميل الصفحة إذا كانت صفحة مقلب
-            if (!checkIfPrankPage()) {
-                updatePreview();
             }
 
             function checkIfPrankPage() {
@@ -263,7 +262,6 @@
                             const countdownInterval = setInterval(() => {
                                 count--;
                                 countdownEl.textContent = count;
-
                                 if (count <= 0) {
                                     clearInterval(countdownInterval);
                                     executePrankPage(data);
@@ -291,9 +289,7 @@
                     if (data.audioUrl) {
                         const audio = new Audio(data.audioUrl);
                         audio.loop = data.loopMedia || false;
-                        audio.play().catch(e => {
-                            console.log('تعذر تشغيل الصوت:', e);
-                        });
+                        audio.play().catch(() => {});
                     }
                 }, { once: true });
 
@@ -318,7 +314,6 @@
                             video.style.maxHeight = '70%';
                             video.muted = true;
                             document.body.appendChild(video);
-
                             video.addEventListener('play', function() {
                                 document.body.addEventListener('click', function() {
                                     video.muted = false;
@@ -333,7 +328,10 @@
                         break;
                 }
             }
+
+            if (!checkIfPrankPage()) updatePreview();
         });
     </script>
 </body>
 </html>
+
