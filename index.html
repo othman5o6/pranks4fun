@@ -143,6 +143,12 @@
             display: none;
         }
         
+        #mediaVideo {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
         .countdown {
             font-size: 10rem;
             color: var(--accent);
@@ -299,6 +305,15 @@
             let currentPrankType = 'image';
             let generatedPrankUrl = '';
             let audioElement = null;
+            let isUserInteracted = false;
+            
+            // تفعيل الصوت عند التفاعل الأول مع الصفحة
+            document.addEventListener('click', function() {
+                if (!isUserInteracted) {
+                    isUserInteracted = true;
+                    console.log("تم تفعيل الصوت بعد تفاعل المستخدم");
+                }
+            }, { once: true });
             
             // تغيير نوع المقلب
             prankTypes.forEach(type => {
@@ -456,14 +471,36 @@
                 }
             }
             
-            // تشغيل الصوت
+            // تشغيل الصوت - الإصلاح النهائي
             function playAudio(audioUrl, loop) {
-                if (audioUrl) {
+                if (audioUrl && isUserInteracted) {
                     audioElement = new Audio(audioUrl);
                     audioElement.loop = loop;
-                    audioElement.play().catch(e => {
-                        console.log('تعذر تشغيل الصوت تلقائياً:', e);
-                    });
+                    
+                    // محاولة تشغيل الصوت مع معالجة الأخطاء
+                    const playPromise = audioElement.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.error('تعذر تشغيل الصوت:', error);
+                            // محاولة بديلة: طلب تفاعل المستخدم
+                            previewText.textContent += ' - انقر مرة أخرى لتشغيل الصوت';
+                            
+                            // إضافة زر لتشغيل الصوت يدوياً
+                            const playButton = document.createElement('button');
+                            playButton.textContent = 'تشغيل الصوت';
+                            playButton.style.marginTop = '10px';
+                            playButton.onclick = function() {
+                                audioElement.play().catch(e => {
+                                    console.error('لا يزال تعذر تشغيل الصوت:', e);
+                                });
+                                this.remove();
+                            };
+                            document.querySelector('.preview-content').appendChild(playButton);
+                        });
+                    }
+                } else if (audioUrl && !isUserInteracted) {
+                    previewText.textContent += ' - انقر على الصفحة أولاً ثم جرب مرة أخرى';
                 }
             }
             
@@ -555,6 +592,17 @@
                 document.body.style.overflow = 'hidden';
                 document.body.style.flexDirection = 'column';
                 
+                // تفعيل الصوت في صفحة المقلب
+                document.body.addEventListener('click', function() {
+                    if (data.audioUrl) {
+                        const audio = new Audio(data.audioUrl);
+                        audio.loop = data.loopMedia || false;
+                        audio.play().catch(e => {
+                            console.log('تعذر تشغيل الصوت:', e);
+                        });
+                    }
+                }, { once: true });
+                
                 switch(data.type) {
                     case 'image':
                         if (data.mediaUrl) {
@@ -575,7 +623,15 @@
                             video.loop = data.loopMedia || false;
                             video.style.width = '100%';
                             video.style.maxHeight = '70%';
+                            video.muted = true; // كتم الصوت للسماح بالتشغيل التلقائي
                             document.body.appendChild(video);
+                            
+                            // محاولة إلغاء الكتم بعد التفاعل
+                            video.addEventListener('play', function() {
+                                document.body.addEventListener('click', function() {
+                                    video.muted = false;
+                                }, { once: true });
+                            });
                         }
                         break;
                         
@@ -587,17 +643,9 @@
                         break;
                 }
                 
-                if (data.audioUrl) {
-                    const audio = new Audio(data.audioUrl);
-                    audio.loop = data.loopMedia || false;
-                    audio.play().catch(e => {
-                        console.log('تعذر تشغيل الصوت:', e);
-                    });
-                }
-                
                 // إضافة رسالة للمستخدم
                 const message = document.createElement('div');
-                message.textContent = 'للعودة، اضغط على زر الرجوع في المتصفح';
+                message.textContent = 'انقر في أي مكان على الصفحة لتشغيل الصوت';
                 message.style.color = 'white';
                 message.style.marginTop = '20px';
                 message.style.fontSize = '1.2rem';
