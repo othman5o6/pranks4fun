@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المقالب!</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+        #scaryImage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        #youtubePlayer {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <img id="scaryImage" alt="مفاجأة!">
+    <iframe id="youtubePlayer" width="0" height="0" frameborder="0" allow="autoplay"></iframe>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const prankId = urlParams.get('id');
+        const prankData = JSON.parse(localStorage.getItem(prankId));
+
+        if (prankData) {
+            if (prankData.image) {
+                document.getElementById('scaryImage').src = prankData.image;
+                document.getElementById('scaryImage').style.display = 'block';
+            }
+            if (prankData.youtubeUrl) {
+                const youtubeUrl = prankData.youtubeUrl;
+                const videoId = youtubeUrl.split('v=')[1].split('&')[0];
+                const player = document.getElementById('youtubePlayer');
+                player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&showinfo=0&rel=0&modestbranding=1`;
+                player.style.display = 'block';
+            }
+        } else {
+            document.body.innerHTML = "<h1>الرابط غير صالح!</h1>";
+        }
+    </script>
+</body>
+</html>
